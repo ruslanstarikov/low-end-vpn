@@ -1,0 +1,13 @@
+- name: Do once on freshly installed VPS - ansible pre-reqs, non-root user, ssh config
+  gather_facts: false
+  hosts: all
+  roles:
+    - doonce
+
+- name: VPN Install
+  hosts: all
+  remote_user: vpnadmin
+  roles:
+    - cli
+    - ikev2
+    - firewall

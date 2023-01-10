@@ -1,0 +1,26 @@
+# file: roles/cli/tasks/3-config-ntp.yml
+
+- name: Install NTP
+  apt: name=ntp state=present
+  become: true
+  tags: ntp
+
+- name: Configure NTP
+  template: src=ntp.conf.j2 dest=/etc/ntp.conf
+  become: true
+  tags: ntp
+
+- name: Make sure NTP is enabled and running
+  service: name=ntp state=started enabled=yes
+  become: true
+  tags: ntp
+
+- name: Set Timezone file to UTC
+  copy: content='{{timezone}}\n'
+        dest=/etc/timezone
+        owner=root
+        group=root
+        mode=0644
+        backup=yes
+  become: true
+  tags: ntp

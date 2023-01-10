@@ -1,0 +1,61 @@
+- name: Creates cacerts directory
+  file:
+    path: /opt/pki/cacerts
+    state: directory
+  become: true
+
+- name: Creates certs directory
+  file:
+    path: /opt/pki/certs
+    state: directory
+  become: true
+
+- name: Creates private directory
+  file:
+    path: /opt/pki/private
+    state: directory
+  become: true
+
+- name: Set permission on PKI directory
+  ansible.builtin.file:
+    path: "/opt/pki"
+    mode: '0700'
+  become: true
+
+- name: Generate Root Certificate
+  raw: 'pki --gen --type rsa --size 4096 --outform pem > /opt/pki/private/ca-key.pem'
+  become: true
+  when: own_ca_cert == true
+
+- name: Generate Root Certificate Authority
+  raw: 'pki --self --ca --lifetime 3650 --in /opt/pki/private/ca-key.pem --type rsa --dn "CN={{root_certificate_authority_name}}" --outform pem > /opt/pki/cacerts/ca-cert.pem'
+  become: true
+  when: own_ca_cert == true
+
+- name: Copy CA private key
+  template: src=ca-key.pem.j2 dest=/opt/pki/private/ca-key.pem
+  become: true
+  when: own_ca_cert == false
+
+- name: Copy CA Root certificate
+  template: src=ca-cert.pem.j2 dest=/opt/pki/cacerts/ca-cert.pem
+  become: true
+  when: own_ca_cert == false
+
+- name: Generate Private Key
+  raw: 'pki --gen --type rsa --size 4096 --outform pem > /opt/pki/private/server-key.pem'
+  become: true
+
+- name: Generate certificate (FQDN)
+  raw: 'pki --pub --in /opt/pki/private/server-key.pem --type rsa | pki --issue --lifetime 1825 --cacert /opt/pki/cacerts/ca-cert.pem --cakey /opt/pki/private/ca-key.pem --dn "CN={{fqdn}}" --san {{fqdn}} --flag serverAuth --flag ikeIntermediate --outform pem >  /opt/pki/certs/server-cert.pem'
+  become: true
+  when: fqdn is defined
+
+- name: Generate certificate (IP Address)
+  raw: 'pki --pub --in /opt/pki/private/server-key.pem --type rsa | pki --issue --lifetime 1825 --cacert /opt/pki/cacerts/ca-cert.pem --cakey /opt/pki/private/ca-key.pem --dn "CN={{ip_address}}" --san {{ip_address}} --san @{{ip_address}} --flag serverAuth --flag ikeIntermediate --outform pem >  /opt/pki/certs/server-cert.pem'
+  become: true
+  when: ip_address is defined
+
+- name: Copy CA / Certificates / Keys
+  raw: 'cp -a /opt/pki/* /etc/ipsec.d'
+  become: true

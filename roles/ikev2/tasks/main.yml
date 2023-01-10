@@ -1,0 +1,4 @@
+# INSTALLS
+- import_tasks: 1-software.yml
+- import_tasks: 2-certificates.yml
+- import_tasks: 3-ipsec.yml

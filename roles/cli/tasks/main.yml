@@ -1,0 +1,3 @@
+- import_tasks: 1-hostname.yml
+- import_tasks: 2-install-helpers.yml
+- import_tasks: 3-config-ntp.yml

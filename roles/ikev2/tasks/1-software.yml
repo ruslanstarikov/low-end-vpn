@@ -1,0 +1,29 @@
+- name: Install Strongswan
+  apt:  name=strongswan state=present
+  become: true
+  tags: ikev2
+
+- name: Install Strongswan-pki
+  apt:  name=strongswan-pki state=present
+  become: true
+  tags: ikev2
+
+- name: Install Libcharon extra plugins
+  apt:  name=libcharon-extra-plugins state=present
+  become: true
+  tags: ikev2
+
+- name: Install Libcharon extauth plugins
+  apt:  name=libcharon-extauth-plugins state=present
+  become: true
+  tags: ikev2
+
+- name: Install Libstrongswan extra plugins
+  apt:  name=libstrongswan-extra-plugins state=present
+  become: true
+  tags: ikev2
+
+- name: Install libtss2-tcti-tabrmd0
+  apt: name=libtss2-tcti-tabrmd0 state=present
+  become: true
+  tags: ikev2

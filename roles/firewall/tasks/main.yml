@@ -1,0 +1,79 @@
+- name: Install UFW
+  apt:  name=ufw state=present
+  become: true
+  tags: firewall
+
+- name: Allow OpenSSH
+  community.general.ufw:
+      rule: allow
+      name: OpenSSH
+  become: true
+  tags: firewall
+
+- name: Set policy and enable UFW
+  community.general.ufw:
+      state: enabled
+      policy: deny
+  become: true
+  tags: firewall
+
+- name: Allow port 500 UDP
+  community.general.ufw:
+      rule: allow
+      port: 500
+      proto: udp
+  become: true
+  tags: firewall
+
+- name: Allow port 4500 UDP
+  community.general.ufw:
+      rule: allow
+      port: 4500
+      proto: udp
+  become: true
+  tags: firewall
+
+- name: Copy Before Rules to UFW
+  template: src=before_rules_clean.j2 dest=/etc/ufw/before.rules
+  become: true
+  tags: firewall
+
+- name: Add IP Forwarding to UFW sysctl
+  lineinfile:
+    dest: /etc/ufw/sysctl.conf
+    line: "net/ipv4/ip_forward=1"
+  become: true
+  tags: firewall
+
+- name: Add Accept Redirects to UFW sysctl
+  lineinfile:
+    dest: /etc/ufw/sysctl.conf
+    line: "net/ipv4/conf/all/accept_redirects=0"
+  become: true
+
+- name: Add Send Redirects to UFW sysctl
+  lineinfile:
+    dest: /etc/ufw/sysctl.conf
+    line: "net/ipv4/conf/all/send_redirects=0"
+  become: true
+  tags: firewall
+
+- name: Add Path MTU to UFW sysctl
+  lineinfile:
+    dest: /etc/ufw/sysctl.conf
+    line: "net/ipv4/ip_no_pmtu_disc=1"
+  become: true
+  tags: firewall
+
+- name: restart UFW service
+  service:
+    name: ufw
+    state: restarted
+  become: true
+  tags: firewall
+
+- name: Reload UFW
+  community.general.ufw:
+    state: reloaded
+  become: true
+  tags: firewall

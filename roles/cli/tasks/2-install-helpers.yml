@@ -1,0 +1,28 @@
+- name: Install Software Properties Common
+  apt:  name=software-properties-common state=present
+  tags: helpers
+  become: true
+
+- name: Install Shell Language Pack
+  apt:  name=language-pack-en-base state=present
+  tags: helpers
+  become: true
+
+- name: Install HTOP
+  apt:  name=htop state=present
+  tags: helpers
+  become: true
+
+- name: Install Figlet
+  apt:  name=figlet state=present
+  tags: helpers
+  become: true
+
+- name: Install Vim
+  apt:  name=vim state=present
+  tags: helpers
+  become: true
+
+
+
+

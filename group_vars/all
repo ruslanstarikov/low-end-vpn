@@ -1,0 +1,20 @@
+# MUST BE CONFIGURED
+ansible_ssh_private_key_file: ~/.ssh/vpn.pem
+ansible_ssh_public_key: abc-public-key
+vpn_users:
+  - username: rando
+    password: rando-pass
+
+# ONLY CHANGE IF REQUIRED
+ntp_main_server: 0.ubuntu.pool.ntp.org
+ntp_fallback_server: 1.ubuntu.pool.ntp.org
+timezone: Etc/UTC
+vpn_network_address: 10.10.10.0/24
+root_certificate_authority_name: "RANDO VPN CA"
+
+network_interface: eth0
+ansible_ssh_pipelining: true
+ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
+own_ca_cert: false
+hostname: "rando-vpn"
+

@@ -1,0 +1,68 @@
+- name: Set connection to ssh
+  set_fact:
+    ansible_connection: ssh
+
+- name: Set Root Password
+  set_fact:
+    ansible_ssh_pass: '{{ use_once_root_ssh_pass }}'
+
+#- name: Update Installation Repositories
+#  raw:  apt update --assume-yes
+#  tags: init
+#  become: true
+
+#- name: Install Python
+#  raw:  apt install python --assume-yes
+#  tags: init
+#  become: true
+#
+#- name: Install Python Apt
+#  raw:  apt install python-apt --assume-yes
+#  tags: init
+#  become: true
+
+- name: Create wheel group
+  group:
+    name: wheel
+    state: present
+  become: true
+
+- name: Create Non-root User
+  user:
+    name: vpnadmin
+    shell: /bin/bash
+    groups: wheel
+  become: true
+
+- name: Copy wheel sudoers file
+  copy: src=../files/wheel
+    dest=/etc/sudoers.d/wheel
+    mode=0600
+  become: true
+
+- name: Copy the id_rsa.pub for vpnadmin user
+  authorized_key:
+    user:   vpnadmin
+    key:    '{{ ansible_ssh_public_key }}'
+    state:  present
+  become: true
+
+- name: Disallow password authentication
+  lineinfile: dest=/etc/ssh/sshd_config
+    regexp="^PasswordAuthentication"
+    line="PasswordAuthentication no"
+    state=present
+  become: true
+
+- name: Disallow root SSH access
+  lineinfile: dest=/etc/ssh/sshd_config
+    regexp="^PermitRootLogin"
+    line="PermitRootLogin no"
+    state=present
+  become: true
+
+- name: Restart SSH
+  service:
+    name: ssh
+    state: restarted
+  become: true

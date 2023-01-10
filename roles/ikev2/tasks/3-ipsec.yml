@@ -1,0 +1,19 @@
+- name: Copy IPSEC config (IP Address)
+  template: src=ipsec_ip_address.conf.j2 dest=/etc/ipsec.conf
+  become: true
+  when: ip_address is defined
+
+- name: Copy IPSEC config (FQDN)
+  template: src=ipsec_fqdn.conf.j2 dest=/etc/ipsec.conf
+  become: true
+  when: fqdn is defined
+
+- name: Copy IPSEC secrets
+  template: src=ipsec_secrets.j2 dest=/etc/ipsec.secrets
+  become: true
+
+- name: Restart Strongswan service
+  service:
+    name: strongswan-starter
+    state: restarted
+  become: true
